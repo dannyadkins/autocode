@@ -28,23 +28,24 @@ if __name__ == "__main__":
 
     # gather requirements 
     project_type = "Next13"
+    
 
-    # check if it exists
-    if not os.path.exists(src_folder):
-        # if not, create it
-        print("Initializing folder ", src_folder, "...")
-        os.mkdir(src_folder)
-    else:
-        # if it does, process it
-        process_repo(src_folder)
+    # # check if it exists
+    # if not os.path.exists(src_folder):
+    #     # if not, create it
+    #     print("Initializing folder ", src_folder, "...")
+    #     os.mkdir(src_folder)
+    # else:
+    #     # if it does, process it
+    #     process_repo(src_folder)
 
-    # needs: what type of project is it? (gather from user)
+    # # needs: what type of project is it? (gather from user)
 
-    planner = PlanningAgent()
-    description, steps = planner.execute(task, project_type)
-    builder = BuildingAgent()
-    for step in steps:
-        builder.execute(step, description)
+    # planner = PlanningAgent()
+    # description, steps = planner.execute(task, project_type)
+    # builder = BuildingAgent()
+    # for step in steps:
+    #     builder.execute(step, description)
 
     # At each task:
     # provide file structure

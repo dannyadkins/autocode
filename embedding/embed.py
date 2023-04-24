@@ -89,3 +89,5 @@ class CustomEmbeddings:
         self.compute_cosine_similarities()
 
     # Other methods for generating synthetic negatives and optimizing the matrix should be added here.
+
+# TODO: should save it into a pickle file in the cache 
