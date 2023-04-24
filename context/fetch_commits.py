@@ -4,8 +4,22 @@ This file contains the code for fetching the commits that involve a particular f
 
 import os
 import subprocess
+from typing import List, Dict, Union
+from dataclasses import dataclass
 
-def fetch_commits(file_path):
+@dataclass
+class Change:
+    change_type: str
+    file: str
+
+@dataclass
+class Commit:
+    commit_hash: str
+    date: str
+    message: str
+    changes: List[Change]
+
+def fetch_commits(file_path: str) -> List[Commit]:
     if not os.path.exists(file_path):
         raise ValueError("Invalid file path")
 
@@ -19,7 +33,6 @@ def fetch_commits(file_path):
     for line in lines:
         if line:
             commit_hash, date, message = line.split(" ", 2)
-            commit = {"hash": commit_hash, "date": date, "message": message}
             
             # Get the changes and other files modified in the commit
             diff_command = f"git diff-tree --no-commit-id --name-status -r {commit_hash}"
@@ -31,12 +44,12 @@ def fetch_commits(file_path):
             for modified_file in modified_files:
                 if modified_file:
                     change_type, file_name = modified_file.split("\t", 1)
-                    changes.append({"type": change_type, "file": file_name})
+                    changes.append(Change(change_type, file_name))
             
-            commit["changes"] = changes
-            commits.append(commit)
+            commits.append(Commit(commit_hash, date, message, changes))
 
     return commits
+
 
 # Example usage
 file_path = "./readme.md"

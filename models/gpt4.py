@@ -11,3 +11,6 @@ def get_completion(model: str, prompt: str):
     if (not model in ['gpt-3.5-turbo', 'gpt-4']):
         raise Exception("Invalid model: " + model)
     return openai.ChatCompletion.create(model=model, messages=[{"role": "user", "content": prompt}])['choices'][0]['message']['content']
+
+def summarize_commits(commits):
+    pass 
