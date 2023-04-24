@@ -15,7 +15,7 @@ from dataclasses import dataclass
 class Embedding:
     index: int
     value: np.ndarray
-    document: Any  # Change this to the appropriate type of your document content
+    document: str 
 
 
 def normalize_embeddings(embeddings: np.ndarray) -> np.ndarray:
