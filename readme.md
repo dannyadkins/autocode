@@ -7,11 +7,11 @@ Automatic codegen using various hierarchical agent flows.
 - [✅] `./main.py` - Main script to run the project
 - [✅] `./readme.md` - The project documentation
 
-### Hierarchies
+### Flows
 
 This is the core of the problem: how can we combine different agents and context to generate codebases?
 
-Hierarchies are sequences of agent executions and different combinations of context provided at each stage.
+Flows are sequences of agent executions and different combinations of context provided at each stage.
 
 ### Agents 🤖
 

@@ -1,4 +1,4 @@
-from hierarchies.flow import Flow
+from flows.flow import Flow
 
 class DirectBuilder(Flow): 
     def run(self, src_folder: str, task: str):
