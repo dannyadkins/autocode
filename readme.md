@@ -22,7 +22,7 @@ Hierarchies are sequences of agent executions and different combinations of cont
 
 The context folder enriches agents' prompts with necessary information and long-term memory. For example, it allows an agent to view the documentation for the framework that the project is using.
 
-- [🚧] `./context/fetch_commits.py` - Fetches commit data for a set of files
+- [✅] `./context/fetch_commits.py` - Fetches commit data for a set of files
 - [✅] `./context/fetch_docs.py` - Fetches framework documentation, e.g. NextJS docs
 - [🚧] `./context/fetch_files.py` - Fetches file data for the project
 
