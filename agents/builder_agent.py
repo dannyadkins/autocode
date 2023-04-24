@@ -1,4 +1,5 @@
-import gpt4
+
+from models import gpt4
 
 class BuildingAgent:
     def __init__(self):
@@ -19,7 +20,6 @@ class BuildingAgent:
         - CREATE <path>: creates a new file with the given path, relative to the root of the project
         - FETCH <path>: loads the contents of the file at the given path, relative to the root of the project
         - OVERWRITE <path> <contents>: overwrites the contents of the file at the given path, relative to the root of the project
-
 
         Please make sure you have all the information you might need. Consider which files you might need to edit, and what you might need to do to them.
 
