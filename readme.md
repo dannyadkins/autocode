@@ -4,7 +4,6 @@ Automatic codegen using various hierarchical agent flows.
 
 ## Project Checklist ✅
 
-- [🚧] `./__init__.py` - Initializes the project as a package
 - [✅] `./main.py` - Main script to run the project
 - [✅] `./readme.md` - The project documentation
 
@@ -23,9 +22,9 @@ Hierarchies are sequences of agent executions and different combinations of cont
 
 The context folder enriches agents' prompts with necessary information and long-term memory. For example, it allows an agent to view the documentation for the framework that the project is using.
 
-- [✅] `./context/fetch_commits.py` - Fetches commit data for a set of files
-- [✅] `./context/fetch_docs.py` - Fetches project documentation
-- [✅] `./context/fetch_files.py` - Fetches file data for the project
+- [🚧] `./context/fetch_commits.py` - Fetches commit data for a set of files
+- [✅] `./context/fetch_docs.py` - Fetches framework documentation, e.g. NextJS docs
+- [🚧] `./context/fetch_files.py` - Fetches file data for the project
 
 ### Embedding 🧩
 
@@ -36,12 +35,11 @@ The context folder enriches agents' prompts with necessary information and long-
 
 This allows the agents to determine if what they're doing is working.
 
-- [✅] `./eval/build.py` - Build evaluation script. Extracts from the package's build script and runs it with human consent and a high-level overview of existing commit changes.
-- [✅] `./eval/tsc.py` - TypeScript compilation script
+- [🚧] `./eval/build.py` - Build evaluation script. Extracts from the package's build script and runs it with human consent and a high-level overview of existing commit changes.
+- [🚧] `./eval/tsc.py` - TypeScript compilation script
 
 ### Infrastructure 🏗️
 
-- [✅] `./infra/__init__.py` - Initializes the infrastructure package
 - [✅] `./infra/cache.py` - Cache management
 
 ### Models 🧠
@@ -51,7 +49,7 @@ This allows the agents to determine if what they're doing is working.
 ### Utilities 🔧
 
 - [✅] `./utils/process_repo.py` - Script to process repository data
-- [✅] `./utils/describe_commits.py` - Script to describe existing commits in English so the human can quickly review and give consent to run the code
+- [🚧] `./utils/describe_commits.py` - Script to describe existing commits in English so the human can quickly review and give consent to run the code
 
 ## Contributing 🙌
 
