@@ -53,4 +53,4 @@ This allows the agents to determine if what they're doing is working.
 
 ## Contributing 🙌
 
-Please feel free to submit pull requests, open issues, or contact the maintainers if you have any questions or suggestions.
+Please feel free to submit pull requests, open issues, or contact me (@dadkins_ on Twitter).
