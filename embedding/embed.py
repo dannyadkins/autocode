@@ -1,76 +1,74 @@
-import numpy as np
-import pandas as pd
+import os
 import pickle
-import random
-from typing import List, Tuple
-import torch
-from sklearn.model_selection import train_test_split
-from openai.embeddings_utils import get_embedding, cosine_similarity
+from typing import List, Any, Tuple
+import numpy as np
+import openai
+from tqdm import tqdm
 
-class EmbeddingsOptimizer:
-    def __init__(
-        self,
-        local_dataset_path: str,
-        embedding_cache_path: str,
-        default_embedding_engine: str,
-        num_pairs_to_embed: int,
-        test_fraction: float,
-        random_seed: int,
-        negatives_per_positive: int,
-        modified_embedding_length: int,
-        batch_size: int,
-        max_epochs: int,
-        learning_rate: float,
-        dropout_fraction: float,
-    ):
-        self.local_dataset_path = local_dataset_path
-        self.embedding_cache_path = embedding_cache_path
-        self.default_embedding_engine = default_embedding_engine
-        self.num_pairs_to_embed = num_pairs_to_embed
-        self.test_fraction = test_fraction
-        self.random_seed = random_seed
-        self.negatives_per_positive = negatives_per_positive
-        self.modified_embedding_length = modified_embedding_length
-        self.batch_size = batch_size
-        self.max_epochs = max_epochs
-        self.learning_rate = learning_rate
-        self.dropout_fraction = dropout_fraction
+from retrieve import Embedding, retrieve_embeddings
+from dotenv import load_dotenv
 
-    def process_input_data(self, df: pd.DataFrame) -> pd.DataFrame:
-        # Customize this function to preprocess your own dataset
-        # output should be a dataframe with 3 columns: text_1, text_2, label (1 for similar, -1 for dissimilar)
-        df["label"] = df["gold_label"]
-        df = df[df["label"].isin(["entailment"])]
-        df["label"] = df["label"].apply(lambda x: {"entailment": 1, "contradiction": -1}[x])
-        df = df.rename(columns={"sentence1": "text_1", "sentence2": "text_2"})
-        df = df[["text_1", "text_2", "label"]]
-        df = df.head(self.num_pairs_to_embed)
-        return df
+load_dotenv()
 
-    def load_and_process_data(self) -> pd.DataFrame:
-        df = pd.read_csv(self.local_dataset_path)
-        df = self.process_input_data(df)
-        return df
+# Set your OpenAI API key
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-    def split_data(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        train_df, test_df = train_test_split(
-            df,
-            test_size=self.test_fraction,
-            stratify=df["label"],
-            random_state=self.random_seed,
-        )
-        train_df.loc[:, "dataset"] = "train"
-        test_df.loc[:, "dataset"] = "test"
-        return train_df, test_df
+def load_embed_store(store_key: str) -> Tuple[np.ndarray, List[Any]]:
+    embeddings_path = f"data/embeddings/{store_key}_embeddings.npy"
+    documents_path = f"data/embeddings/{store_key}_documents.pkl"
 
-    def dataframe_of_negatives(self, dataframe_of_positives: pd.DataFrame) -> pd.DataFrame:
-        texts = set(dataframe_of_positives["text_1"].values) | set(
-            dataframe_of_positives["text_2"].values
-        )
-        all_pairs = {(t1, t2) for t1 in texts for t2 in texts if t1 < t2}
-        positive_pairs = set(
-            tuple(text_pair)
-            for text_pair in dataframe_of_positives[["text_1", "text_2"]].values
-        )
-        negative_pairs = all_pairs - positive_pairs
-        df_of_negatives = pd.DataFrame(list(negative_pairs), columns=["text_
+    if os.path.exists(embeddings_path) and os.path.exists(documents_path):
+        embeddings = np.load(embeddings_path)
+        with open(documents_path, "rb") as f:
+            documents = pickle.load(f)
+        return embeddings, documents
+    else:
+        raise FileNotFoundError(f"Embeddings or documents not found for store key: {store_key}")
+
+
+def save_embed_store(store_key: str, embeddings: np.ndarray, documents: List[Any]):
+    os.makedirs("embeddings", exist_ok=True)
+    embeddings_path = f"data/embeddings/{store_key}_embeddings.npy"
+    documents_path = f"data/embeddings/{store_key}_documents.pkl"
+
+    np.save(embeddings_path, embeddings)
+    with open(documents_path, "wb") as f:
+        pickle.dump(documents, f)
+
+
+def embed_documents(texts: List[str], model: str = "text-embedding-ada-002") -> np.ndarray:
+    texts = [text.replace("\n", " ") for text in texts]
+    response = openai.Embedding.create(input=texts, model=model)
+    return np.array([embedding_data['embedding'] for embedding_data in response['data']])
+
+
+def build_embedding_store(documents: List[Any], store_key: str, model: str = "text-embedding-ada-002"):
+    embeddings = embed_documents(documents, model)
+    save_embed_store(store_key, embeddings, documents)
+
+
+def main():
+    # Example usage
+    documents = [
+        "The quick brown fox jumps over the lazy dog",
+        "I love artificial intelligence and natural language processing",
+        "Deep learning is a powerful technique for solving complex problems",
+        "DEEP LEARN SO COOL YEAH"
+    ]
+
+    store_key = "example"
+    build_embedding_store(documents, store_key)
+
+    embeddings, documents = load_embed_store(store_key)
+    query = "What is deep learning?"
+    query_embedding = embed_documents([query])  # Make sure it's a 1D array
+    
+    num_docs = 3
+    retrieved_docs = retrieve_embeddings(query_embedding, embeddings, documents, num_docs, method='knn')
+    print("Retrieved documents:")
+    for doc in retrieved_docs:
+        print(doc.document)
+
+
+if __name__ == "__main__":
+    main()

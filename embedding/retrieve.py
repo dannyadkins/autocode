@@ -15,7 +15,7 @@ from dataclasses import dataclass
 class Embedding:
     index: int
     value: np.ndarray
-    document: str 
+    document: Any  # Change this to the appropriate type of your document content
 
 
 def normalize_embeddings(embeddings: np.ndarray) -> np.ndarray:
@@ -23,12 +23,14 @@ def normalize_embeddings(embeddings: np.ndarray) -> np.ndarray:
 
 
 def knn_retrieval(query: np.ndarray, embeddings: np.ndarray, documents: List[Any], num_docs: int) -> List[Embedding]:
-    similarities = embeddings.dot(query)
+    similarities = embeddings.dot(query.T)
+    similarities = similarities.flatten()
     sorted_ix = np.argsort(-similarities)
     
     result = []
     for k in sorted_ix[:num_docs]:
-        result.append(Embedding(k, similarities[k], documents[k]))
+        print("k: ", k)
+        result.append(Embedding(k, similarities[k], np.array(documents)[k]))
     
     return result
 
@@ -52,7 +54,7 @@ def svm_retrieval(query: np.ndarray, embeddings: np.ndarray, documents: List[Any
 
 
 def retrieve_embeddings(query: np.ndarray, embeddings: np.ndarray, documents: List[Any], num_docs: int, method: str = 'svm', c: float = 0.1) -> List[Embedding]:
-    normalized_query = normalize_embeddings(query)
+    normalized_query = normalize_embeddings(query[np.newaxis, :])[0]
     normalized_embeddings = normalize_embeddings(embeddings)
 
     if method == 'knn':
