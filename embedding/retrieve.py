@@ -29,7 +29,6 @@ def knn_retrieval(query: np.ndarray, embeddings: np.ndarray, documents: List[Any
     
     result = []
     for k in sorted_ix[:num_docs]:
-        print("k: ", k)
         result.append(Embedding(k, similarities[k], np.array(documents)[k]))
     
     return result
@@ -52,8 +51,6 @@ def svm_retrieval(query: np.ndarray, embeddings: np.ndarray, documents: List[Any
         result.append(Embedding(k, similarities[k], np.array(documents)[k]))
 
     return result
-
-
 
 def retrieve_embeddings(query: np.ndarray, embeddings: np.ndarray, documents: List[Any], num_docs: int, method: str = 'svm', c: float = 0.1) -> List[Embedding]:
     normalized_query = normalize_embeddings(query[np.newaxis, :])[0]

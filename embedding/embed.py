@@ -5,6 +5,8 @@ import numpy as np
 import openai
 from tqdm import tqdm
 
+from context.docs import fetch_docs
+
 from retrieve import Embedding, retrieve_embeddings
 from dotenv import load_dotenv
 
@@ -38,6 +40,13 @@ def save_embed_store(store_key: str, embeddings: np.ndarray, documents: List[Any
 
 def embed_documents(texts: List[str], model: str = "text-embedding-ada-002") -> np.ndarray:
     texts = [text.replace("\n", " ") for text in texts]
+
+
+    # for each text, ensure that it is less than 8191 tokens
+    for i in range(0, len(texts)):
+        if len(texts[i].split()) > (6000):
+            texts[i] = " ".join(texts[i].split()[:6000])
+
     response = openai.Embedding.create(input=texts, model=model)
     return np.array([embedding_data['embedding'] for embedding_data in response['data']])
 
@@ -55,22 +64,17 @@ def add_to_embedding_store(document: Any, store_key: str, model: str = "text-emb
 
 def main():
     # Example usage
-    documents = [
-        "The quick brown fox jumps over the lazy dog",
-        "I love artificial intelligence and natural language processing",
-        "Deep learning is a powerful technique for solving complex problems",
-        "DEEP LEARN SO COOL YEAH"
-    ]
+    documents = fetch_docs("Next13")
 
-    store_key = "example"
-    build_embedding_store(documents, store_key)
+    store_key = "docs-Next13"
+    build_embedding_store([doc['content'] for doc in documents], store_key)
 
     embeddings, documents = load_embed_store(store_key)
-    query = "What is deep learning?"
+    query = "server side rendering"
     query_embedding = embed_documents([query])  # Make sure it's a 1D array
     
     num_docs = 3
-    retrieved_docs = retrieve_embeddings(query_embedding, embeddings, documents, num_docs, method='svm')
+    retrieved_docs = retrieve_embeddings(query_embedding, embeddings, documents, num_docs, method='knn')
     print("Retrieved documents:")
     for doc in retrieved_docs:
         print(doc.document)

@@ -3,3 +3,4 @@ outputs
 venv
 __pycache__
 .cache
+data/embeddings/*

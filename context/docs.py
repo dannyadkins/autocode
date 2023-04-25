@@ -26,9 +26,9 @@ def get_absolute_link(url: str, link: str):
         return base_url + link
 
 def fetch_page_content(url: str, match: str, visited: set):
-    cached = get_cache(url)
-    if cached:
-        return cached
+    # cached = get_cache(url)
+    # if cached:
+    #     return cached
 
     if url in visited:
         return []
@@ -51,7 +51,6 @@ def fetch_page_content(url: str, match: str, visited: set):
     return docs
 
 def fetch_docs(framework: str):
-    # checks if downloaded locally
 
     # if not, crawl and download
     base_url = framework_urls[framework]["base_url"]
@@ -60,11 +59,8 @@ def fetch_docs(framework: str):
     visited = set()
     docs = fetch_page_content(base_url, match, visited)
 
-    # checks if embedded
-    for doc in docs:
-        set_cache(doc['url'], docs)
+    # # checks if embedded
+    # for doc in docs:
+    #     set_cache(doc['url'], docs)
 
     return docs
-
-docs = fetch_docs("Next13")
-print(docs)
