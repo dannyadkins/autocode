@@ -47,6 +47,12 @@ def build_embedding_store(documents: List[Any], store_key: str, model: str = "te
     save_embed_store(store_key, embeddings, documents)
 
 
+def add_to_embedding_store(document: Any, store_key: str, model: str = "text-embedding-ada-002"):
+    embeddings, documents = load_embed_store(store_key)
+    embeddings = np.concatenate([embeddings, embed_documents([document], model)])
+    documents.append(document)
+    save_embed_store(store_key, embeddings, documents)
+
 def main():
     # Example usage
     documents = [
@@ -64,7 +70,7 @@ def main():
     query_embedding = embed_documents([query])  # Make sure it's a 1D array
     
     num_docs = 3
-    retrieved_docs = retrieve_embeddings(query_embedding, embeddings, documents, num_docs, method='knn')
+    retrieved_docs = retrieve_embeddings(query_embedding, embeddings, documents, num_docs, method='svm')
     print("Retrieved documents:")
     for doc in retrieved_docs:
         print(doc.document)

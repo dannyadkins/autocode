@@ -36,21 +36,23 @@ def knn_retrieval(query: np.ndarray, embeddings: np.ndarray, documents: List[Any
 
 
 def svm_retrieval(query: np.ndarray, embeddings: np.ndarray, documents: List[Any], num_docs: int, c: float = 0.1) -> List[Embedding]:
-    x = np.concatenate([query[None, ...], embeddings])
+    query = query.reshape(1, -1)  # Reshape the query to have a shape of (1, n)
+    x = np.concatenate([query, embeddings])
     y = np.zeros(len(x))
     y[0] = 1
 
     clf = svm.LinearSVC(class_weight='balanced', verbose=False, max_iter=10000, tol=1e-6, C=c)
     clf.fit(x, y)
 
-    similarities = clf.decision_function(x)
+    similarities = clf.decision_function(x)[1:]
     sorted_ix = np.argsort(-similarities)
     
     result = []
     for k in sorted_ix[:num_docs]:
-        result.append(Embedding(k, similarities[k], documents[k]))
+        result.append(Embedding(k, similarities[k], np.array(documents)[k]))
 
     return result
+
 
 
 def retrieve_embeddings(query: np.ndarray, embeddings: np.ndarray, documents: List[Any], num_docs: int, method: str = 'svm', c: float = 0.1) -> List[Embedding]:
